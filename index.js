@@ -2,6 +2,8 @@ import express from "express";
 import cors from 'cors'
 import bodyParser from "body-parser";
 import axios from "axios";
+import homeRoutes from './routes/home.js'
+import { middle } from "./middlewares/middle.js";
 const app = express();
 
 app.use(cors())
@@ -9,9 +11,7 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded());
 
 
-app.get("/", (req, res) => {
-    res.json({ "data": "Hi I am running" });
-})
+app.get("/",middle, homeRoutes);
 
 app.get("/joke", async (req, res) => {
     const response = await axios.get("https://catfact.ninja/fact");
