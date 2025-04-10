@@ -32,8 +32,8 @@ app.use(express.json());
 
 // routes use kia hai yaha pe
 
-app.use("/", homeRoutes);
 app.use("/auth", authRoutes)
+app.use("/", verifyToken, homeRoutes);
 
 
 // server idhar fire hua hai
