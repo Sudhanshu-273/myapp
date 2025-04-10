@@ -11,12 +11,14 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded());
 
 
-app.get("/",middle, homeRoutes);
+app.get("/", middle, homeRoutes);
 
 app.get("/joke", async (req, res) => {
     const response = await axios.get("https://catfact.ninja/fact");
     res.send(response.data.fact);
 })
+
+
 
 app.post("/add", (req, res) => {
     console.log("Data jo aaya ------->", req.body);
