@@ -19,7 +19,22 @@ export const login = async (req, res) => {
                 message: "User not Found.",
             })
         }
-        // const passwordMatch 
+        const passwordMatch = bcrypt.compareSync(
+            password.toString(),
+            user.password
+          );
+          if (!passwordMatch) {
+            return res.status(401).json({
+              success: false,
+              message: "Incorrect password",
+            });
+          }
+      
+          return res.status(200).json({
+            success: true,
+            message: "Login successful",
+          });
+      
         
     } catch(error)
     {
