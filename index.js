@@ -32,7 +32,7 @@ app.use(express.json());
 
 // routes use kia hai yaha pe
 
-app.use("/", verifyToken, homeRoutes);
+app.use("/", homeRoutes);
 app.use("/auth", authRoutes)
 
 
