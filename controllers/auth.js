@@ -2,7 +2,7 @@
 import { QueryError, Sequelize } from "sequelize";
 import { sequelize } from "../db.config.js";
 import jwt from "jsonwebtoken";
-// import {bcrypt} from 'bcrypt'
+import bcrypt from 'bcrypt'
 
 export const user_data = async (req, res) => {
     const [data] = await sequelize.query("SELECT * FROM users");
@@ -29,6 +29,13 @@ export const login = async (req, res) => {
                 email: email,
             }
         })
+
+        if (!data) {
+            return res.status(404).json({
+                success: false,
+                message: "User not Found.",
+            })
+        }
 
         console.log(data);
 
@@ -78,10 +85,10 @@ export const login = async (req, res) => {
 export const register = async (req, res) => {
 
     try {
-        const { name, password, confirmPassword} = req.body;
+        const { email, password, confirmPassword } = req.body;
 
-        if (!name || !password || !confirmPassword) {
-            return res.status(400).json({ message: "Name, password, and confirmPassword are required" });
+        if (!email || !password || !confirmPassword) {
+            return res.status(400).json({ message: "email, password, and confirmPassword are required" });
         }
 
         if (password !== confirmPassword) {
@@ -89,14 +96,14 @@ export const register = async (req, res) => {
         }
 
 
-        const [existingUser] = await sequelize.query("SELECT * FROM users WHERE name = :name", {
-            replacements: { name },
-            type: sequelize.QueryTypes.SELECT
+        const [existingUser] = await sequelize.query("SELECT * FROM users WHERE email = :email", {
+            replacements: { email },
         });
 
-        // console.log(existingUser);
+        console.log('Existing user:', existingUser);
 
-        if (existingUser) {
+
+        if (existingUser.length) {
             return res.status(409).json({ message: "User already registered" });
         }
 
@@ -104,9 +111,9 @@ export const register = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
         const result = await sequelize.query(
-            "INSERT INTO users (name, password) VALUES (:name, :hashedPassword)",
+            "INSERT INTO users (email, password) VALUES (:email, :hashedPassword)",
             {
-                replacements: { name, hashedPassword },
+                replacements: { email, hashedPassword },
             }
         );
 
@@ -123,6 +130,6 @@ export const register = async (req, res) => {
 
         return res.status(500).json({ message: "Database error, please try again later" });
     }
-    
-    
+
+
 }
