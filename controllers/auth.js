@@ -1,5 +1,6 @@
 import { QueryError } from "sequelize";
 import { sequelize } from "../db.config.js";
+import {bcrypt} from 'bcrypt'
 
 export const user_data = async (req,res) => {
     const [data] = await sequelize.query("SELECT * FROM users");
