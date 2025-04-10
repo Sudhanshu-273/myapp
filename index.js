@@ -10,7 +10,7 @@ import { verifyToken } from "./middlewares/auth.js";
 
 // express app initialize hua hai
 
-const app = express();
+const app = express()
 
 
 // sequelize connect kia hai
