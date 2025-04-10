@@ -1,7 +1,6 @@
 import express from "express";
 import cors from 'cors'
 import bodyParser from "body-parser";
-import axios from "axios";
 import homeRoutes from './routes/home.js'
 import { middle } from "./middlewares/middle.js";
 import { sequelize } from './db.config.js'
