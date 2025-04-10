@@ -4,26 +4,39 @@ import bodyParser from "body-parser";
 import axios from "axios";
 import homeRoutes from './routes/home.js'
 import { middle } from "./middlewares/middle.js";
+import { sequelize } from './db.config.js'
+import authRoutes from './routes/auth.js'
+
+
+// express app initialize hua hai
+
 const app = express();
+
+
+// sequelize connect kia hai
+
+sequelize.authenticate()
+    .then(() => {
+        console.log("Database connected successfully");
+    })
+    .catch((err) => {
+        console.log("Error connecting to database: ", err);
+    });
+
+// middleware use kia hai basic wale saare
 
 app.use(cors())
 app.use(bodyParser.json())
-app.use(bodyParser.urlencoded());
+app.use(bodyParser.urlencoded())
+app.use(express.json());
+
+// routes use kia hai yaha pe
+
+app.use("/", middle, homeRoutes);
+app.use("/auth", authRoutes)
 
 
-app.get("/", middle, homeRoutes);
-
-app.get("/joke", async (req, res) => {
-    const response = await axios.get("https://catfact.ninja/fact");
-    res.send(response.data.fact);
-})
-
-
-
-app.post("/add", (req, res) => {
-    console.log("Data jo aaya ------->", req.body);
-    res.status(201).json({ "data": "Posted Successfully" });
-});
+// server idhar fire hua hai
 
 
 app.listen(8080, (req, res) => {
