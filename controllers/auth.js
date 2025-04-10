@@ -7,7 +7,4 @@ export const register = async (req, res) => {
     if (password !== confirmPassword) {
         return res.status(400).json({ message: "Passwords do not match" });
     }
-
-    
-
 }
