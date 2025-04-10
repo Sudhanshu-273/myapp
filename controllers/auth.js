@@ -9,7 +9,7 @@ export const user_data = async (req,res) => {
 
 }
 export const login = async (req, res) => {
-    res.send("Logged in");
+    res.send("Logged in successfully");
     console.log(body);
     try {
         const user = user_data.data;
