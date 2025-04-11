@@ -6,6 +6,9 @@ import { middle } from "./middlewares/middle.js";
 import { sequelize } from './db.config.js'
 import authRoutes from './routes/auth.js'
 import { verifyToken } from "./middlewares/auth.js";
+import salesRoutes from './routes/sales.js'
+import purchasesRoutes from './routes/purchases.js'
+import productsRoutes from './routes/products.js'
 
 
 // express app initialize hua hai
@@ -33,7 +36,10 @@ app.use(express.json());
 // routes use kia hai yaha pe
 
 app.use("/auth", authRoutes)
-app.use("/", verifyToken, homeRoutes);
+app.use("/sale", salesRoutes);
+app.use("/purchases", purchasesRoutes);
+app.use("/products", productsRoutes);
+// app.use("/", verifyToken, homeRoutes);
 
 
 // server idhar fire hua hai
