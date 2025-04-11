@@ -5,4 +5,5 @@ const router = express.Router();
 
 router.post('/add', addSale);
 
+
 export default router;
