@@ -2,15 +2,7 @@ import { sequelize } from "../db.config.js";
 
 export const home = async (req, res) => {
 
-    console.log(req.user);
-
-    const [data] = await sequelize.query("SELECT * FROM users where id = :id", {
-        replacements: {
-            id: req.user.id,
-        }
-    });
-
-    res.json({ "data": data });
+    res.json({ "message": "Welcome to the home page" });
 }
 
 export const getAllEquipment = async (req, res) => {

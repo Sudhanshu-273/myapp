@@ -39,7 +39,7 @@ app.use("/auth", authRoutes)
 app.use("/sale", salesRoutes);
 app.use("/purchases", purchasesRoutes);
 app.use("/products", productsRoutes);
-// app.use("/", verifyToken, homeRoutes);
+app.use("/", homeRoutes);
 
 
 // server idhar fire hua hai
