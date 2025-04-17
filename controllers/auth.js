@@ -49,15 +49,6 @@ export const login = async (req, res) => {
             });
         }
 
-        // res.status(200).json({
-        //     success: true,
-        //     message: "Login successful",
-        //     data: {
-        //         id: user_id,
-        //         email: email,
-        //     },
-        // })
-
         const token = jwt.sign({
             id: user_id
         }, process.env.JWT_SECRET, {

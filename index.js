@@ -9,7 +9,7 @@ import { verifyToken } from "./middlewares/auth.js";
 import salesRoutes from './routes/sales.js'
 import purchasesRoutes from './routes/purchases.js'
 import productsRoutes from './routes/products.js'
-
+import customerRoutes from './routes/customer.js'
 
 // express app initialize hua hai
 
@@ -40,7 +40,7 @@ app.use("/sale", salesRoutes);
 app.use("/purchases", purchasesRoutes);
 app.use("/products", productsRoutes);
 app.use("/", homeRoutes);
-
+app.use("/customer", customerRoutes); 
 
 // server idhar fire hua hai
 
