@@ -27,3 +27,35 @@ export const addPurchase = async (req, res) => {
         return res.status(500).json({ message: "Internal server error" });
     }
 };
+
+export const getProduct = async (req, res) => {
+  try {
+    const [products] = await sequelize.query(`
+      SELECT products.name 
+      FROM products 
+      JOIN purchases ON products.id = purchases.product_id
+    `);
+
+    if (!products || products.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No products found with purchases.",
+        data: [],
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Products fetched successfully.",
+      data: products,
+    });
+
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error.",
+      error: error.message || "Unknown error",
+    });
+  }
+};
