@@ -42,7 +42,7 @@ export const login = async (req, res) => {
         const user_id = data.id;
 
 
-        if (password !== data.password) {
+        if (!(await bcrypt.compare(password, data.password))) {
             return res.status(401).json({
                 success: false,
                 message: "Incorrect password",
