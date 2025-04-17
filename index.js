@@ -6,13 +6,18 @@ import { middle } from "./middlewares/middle.js";
 import { sequelize } from "./db.config.js";
 import authRoutes from "./routes/auth.js";
 import { verifyToken } from "./middlewares/auth.js";
-import salesRoutes from "./routes/sales.js";
-import purchasesRoutes from "./routes/purchases.js";
-import productsRoutes from "./routes/products.js";
+
+import salesRoutes from './routes/sales.js'
+import purchasesRoutes from './routes/purchases.js'
+import productsRoutes from './routes/products.js'
+
+import customerRoutes from './routes/customer.js'
+
 
 // express app initialize hua hai
 
-const app = express();
+const app = express()
+
 
 // swagger setup
 
@@ -42,6 +47,10 @@ app.use("/sale", salesRoutes);
 app.use("/purchases", purchasesRoutes);
 app.use("/products", productsRoutes);
 app.use("/", homeRoutes);
+
+
+app.use("/customer", customerRoutes); 
+
 
 // server idhar fire hua hai
 
