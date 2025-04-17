@@ -9,32 +9,14 @@ import { verifyToken } from "./middlewares/auth.js";
 import salesRoutes from './routes/sales.js'
 import purchasesRoutes from './routes/purchases.js'
 import productsRoutes from './routes/products.js'
-// import swaggerJsDoc from 'swagger-jsdoc';
-// import swaggerUi from 'swagger-ui-express';
+
+import customerRoutes from './routes/customer.js'
 
 
 // express app initialize hua hai
 
 const app = express()
 
-// swagger setup 
-
-// const swaggerOptions = {
-//     swaggerDefinition: {
-//         myapi: '3.0.0',
-//         info: {
-//             title: 'My API',
-//             version: '1.0.0',
-//             description: 'API documentation',
-//         },
-//         servers: [
-//             {
-//                 url: 'http://localhost:3000',
-//             },
-//         ],
-//     },
-//     apis: ['./routes/*.js'], // files containing annotations as above
-// };
 
 
 // sequelize connect kia hai
@@ -62,10 +44,7 @@ app.use("/purchases", purchasesRoutes);
 app.use("/products", productsRoutes);
 app.use("/", homeRoutes);
 
-// swagger initialize 
-
-// const swaggerDocs = swaggerJsDoc(swaggerOptions);
-// app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+app.use("/customer", customerRoutes); 
 
 
 // server idhar fire hua hai
