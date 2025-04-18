@@ -4,7 +4,7 @@ export const getCustomer = async (req, res) => {
   try {
     // Run the query to get customer names with their account type name
     const [customers] = await sequelize.query(
-      `SELECT users.name, user_accounts.account_type_name 
+      `SELECT users.id, users.name, user_accounts.account_type_name 
        FROM users 
        JOIN user_accounts ON users.account_type = user_accounts.account_type_id`
     );

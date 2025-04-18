@@ -47,8 +47,6 @@ app.use("/sale", salesRoutes);
 app.use("/purchases", purchasesRoutes);
 app.use("/products", productsRoutes);
 app.use("/", homeRoutes);
-
-
 app.use("/customer", customerRoutes); 
 
 
