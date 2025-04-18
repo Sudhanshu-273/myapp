@@ -11,8 +11,8 @@ export const addSale = async (req, res) => {
     const currentDate = moment().format("YYYY-MM-DD");
 
     const insertQuery = `
-        INSERT INTO sales (customer_id, product_id, totalAmount, quantity, date)
-        VALUES (:customer_id, :product_id, :totalAmount, :quantity, :date)
+        INSERT INTO sales (customer_id, product_id, totalAmount, quantity, sale_date)
+        VALUES (:customer_id, :product_id, :totalAmount, :quantity, :sale_date)
     `;
 
     try {
@@ -22,7 +22,7 @@ export const addSale = async (req, res) => {
                 product_id,
                 totalAmount,
                 quantity,
-                date: currentDate,
+                sale_date: currentDate,
             },
             type: sequelize.QueryTypes.INSERT,
         });
