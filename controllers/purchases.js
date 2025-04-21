@@ -31,9 +31,8 @@ export const addPurchase = async (req, res) => {
 export const getProduct = async (req, res) => {
   try {
     const [products] = await sequelize.query(`
-      SELECT products.name 
+      SELECT products.name, products.price 
       FROM products 
-      JOIN purchases ON products.id = purchases.product_id
     `);
 
     if (!products || products.length === 0) {
