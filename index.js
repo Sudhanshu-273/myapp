@@ -10,7 +10,7 @@ import { verifyToken } from "./middlewares/auth.js";
 import salesRoutes from './routes/sales.js'
 import purchasesRoutes from './routes/purchases.js'
 import productsRoutes from './routes/products.js'
-
+import userRoutes from    './routes/user.js'
 import customerRoutes from './routes/customer.js'
 
 
@@ -48,6 +48,7 @@ app.use("/purchases", purchasesRoutes);
 app.use("/products", productsRoutes);
 app.use("/", homeRoutes);
 app.use("/customer", customerRoutes); 
+app.use("/user", userRoutes);
 
 
 // server idhar fire hua hai
