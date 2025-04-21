@@ -1,46 +1,46 @@
-import {QueryError, Sequelize} from "sequelize";
-import {sequelize} from "../db.config.js";
+import { QueryError, Sequelize } from "sequelize";
+import { sequelize } from "../db.config.js";
 import jwt from "jsonwebtoken";
-import bcrypt from 'bcrypt'
+import bcrypt from "bcrypt";
 import nodemailer from "nodemailer";
 
 export const user_data = async (req, res) => {
     const [data] = await sequelize.query("SELECT * FROM users");
     console.log(data);
-    res.json({"data": data});
-
-}
-
+    res.json({ data: data });
+};
 
 export const login = async (req, res) => {
     const user = req.body;
     try {
-        console.log(user)
+        console.log(user);
         if (!user) {
             return res.status(404).json({
                 success: false,
                 message: "User not Found.",
-            })
+            });
         }
-        const {email, password} = user;
+        const { email, password } = user;
 
-        const [[data], m1] = await sequelize.query("select * from users where email = :email", {
-            replacements: {
-                email: email,
-            }
-        })
+        const [[data], m1] = await sequelize.query(
+            "select * from users where email = :email",
+            {
+                replacements: {
+                    email: email,
+                },
+            },
+        );
 
         if (!data) {
             return res.status(404).json({
                 success: false,
                 message: "User not Found.",
-            })
+            });
         }
 
         console.log(data);
 
         const user_id = data.id;
-
 
         if (!(await bcrypt.compare(password, data.password))) {
             return res.status(401).json({
@@ -49,11 +49,15 @@ export const login = async (req, res) => {
             });
         }
 
-        const token = jwt.sign({
-            id: user_id
-        }, process.env.JWT_SECRET, {
-            expiresIn: '9999h'
-        });
+        const token = jwt.sign(
+            {
+                id: user_id,
+            },
+            process.env.JWT_SECRET,
+            {
+                expiresIn: "9999h",
+            },
+        );
 
         res.status(201).json({
             success: true,
@@ -62,41 +66,44 @@ export const login = async (req, res) => {
             token: token,
             message: "Login successful",
         });
-
-
     } catch (error) {
         console.log(error);
         return res.status(500).json({
             data: {},
             success: false,
             message: "some error occured",
-        })
+        });
     }
-}
+};
 
 export const register = async (req, res) => {
-
     try {
-        const {email, password, confirmPassword} = req.body;
+        const { email, password, confirmPassword } = req.body;
 
         if (!email || !password || !confirmPassword) {
-            return res.status(400).json({message: "email, password, and confirmPassword are required"});
+            return res
+                .status(400)
+                .json({
+                    message:
+                        "email, password, and confirmPassword are required",
+                });
         }
 
         if (password !== confirmPassword) {
-            return res.status(400).json({message: "Passwords do not match"});
+            return res.status(400).json({ message: "Passwords do not match" });
         }
 
+        const [existingUser] = await sequelize.query(
+            "SELECT * FROM users WHERE email = :email",
+            {
+                replacements: { email },
+            },
+        );
 
-        const [existingUser] = await sequelize.query("SELECT * FROM users WHERE email = :email", {
-            replacements: {email},
-        });
-
-        console.log('Existing user:', existingUser);
-
+        console.log("Existing user:", existingUser);
 
         if (existingUser.length) {
-            return res.status(409).json({message: "User already registered"});
+            return res.status(409).json({ message: "User already registered" });
         }
 
         const saltRounds = 10;
@@ -105,33 +112,36 @@ export const register = async (req, res) => {
         const result = await sequelize.query(
             "INSERT INTO users (email, password) VALUES (:email, :hashedPassword)",
             {
-                replacements: {email, hashedPassword},
-            }
+                replacements: { email, hashedPassword },
+            },
         );
 
-        console.log('User created successfully:', result);
+        console.log("User created successfully:", result);
 
-        return res.status(201).json({message: "User registered successfully"});
-
+        return res
+            .status(201)
+            .json({ message: "User registered successfully" });
     } catch (error) {
-        console.error('Error during registration:', error);
+        console.error("Error during registration:", error);
 
         if (error instanceof Error) {
-            return res.status(500).json({message: "Server error, please try again later"});
+            return res
+                .status(500)
+                .json({ message: "Server error, please try again later" });
         }
 
-        return res.status(500).json({message: "Database error, please try again later"});
+        return res
+            .status(500)
+            .json({ message: "Database error, please try again later" });
     }
-
-
-}
+};
 
 export const generateOtp = () => {
     return Math.floor(Math.random() * 900000) + 100000;
-}
+};
 
 export const sendOtp = async (req, res) => {
-    const {user_id, email} = req.body;
+    const { user_id, email } = req.body;
 
     console.log(process.env.MAIL_USER);
 
@@ -153,61 +163,57 @@ export const sendOtp = async (req, res) => {
       <p>My Gym App</p>
     </div>
   </div>
-</div>`
-
+</div>`;
 
     const mailTransporter = nodemailer.createTransport({
         service: "gmail",
         auth: {
             user: process.env.MAIL_USER,
             pass: process.env.MAIL_PASS,
-        }
-    })
+        },
+    });
 
     try {
         await mailTransporter.sendMail({
             from: "mygymm@gmail.com",
             to: email,
             subject: "Otp",
-            html: html_text
-        })
+            html: html_text,
+        });
 
         res.send({
             success: true,
             message: "Email sent successfully",
-            otp: otp
-        })
+            otp: otp,
+        });
     } catch (err) {
         console.log(err);
         res.status(500).json({
-            error: err
-        })
+            error: err,
+        });
+    }
+};
+
+export const verifyOtp = async (req, res) => {
+    const { user_id, email, otp } = req.body;
+    const storedOtp = localStorage.getItem("otp");
+    if (!storedOtp) {
+        return res.status(401).json({
+            success: false,
+            message: "Otp not found",
+        });
+    }
+    if (storedOtp !== otp) {
+        return res.status(401).json({
+            success: false,
+            message: "Incorrect otp",
+        });
     }
 
-    export const verifyOtp = async (req, res) => {
-        const {user_id, email, otp} = req.body;
-        const storedOtp = localStorage.getItem("otp");
-        if (!storedOtp) {
-            return res.status(401).json({
-                success: false,
-                message: "Otp not found",
-            })
-        }
-        if (storedOtp !== otp) {
-            return res.status(401).json({
-                success: false,
-                message: "Incorrect otp",
-            })
-        }
+    // verify user code
 
-        // verify user code
-
-
-        return res.status(200).json({
-            success: true,
-            message: "User verified",
-        })
-    }
-
-
-}
+    return res.status(200).json({
+        success: true,
+        message: "User verified",
+    });
+};
