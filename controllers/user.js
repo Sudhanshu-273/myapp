@@ -1,5 +1,5 @@
 import { sequelize } from "../db.config.js";
-
+import bcrypt from "bcrypt"
 export const updateUser = async (req, res) => {
   try {
     const { id, name, email, phone } = req.body;
@@ -75,6 +75,71 @@ export const updateUser = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Something went wrong while updating user.",
+      error: error.message,
+    });
+  }
+};
+
+
+export const forgotPassword = async (req, res) => {
+  try {
+    const { email, newPassword } = req.body;
+
+    if (!email || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: "Email and new password are required.",
+      });
+    }
+
+    const [user] = await sequelize.query(
+      `SELECT id, email, password FROM users WHERE email = :email`,
+      {
+        replacements: { email },
+        type: sequelize.QueryTypes.SELECT,
+      }
+    );
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found with this email.",
+      });
+    }
+
+
+    const isSame = await bcrypt.compare(newPassword, user.password);
+    if (isSame) {
+      return res.status(400).json({
+        success: false,
+        message: "New password cannot be the same as the old password.",
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+  
+    await sequelize.query(
+      `UPDATE users SET password = :hashedPassword WHERE id = :id`,
+      {
+        replacements: {
+          id: user.id,
+          hashedPassword,
+        },
+        type: sequelize.QueryTypes.UPDATE,
+      }
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Password updated successfully.",
+    });
+
+  } catch (error) {
+    console.error("Forgot password error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Something went wrong.",
       error: error.message,
     });
   }
