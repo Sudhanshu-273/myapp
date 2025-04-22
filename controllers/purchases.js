@@ -2,10 +2,10 @@ import { sequelize } from "../db.config.js";
 import moment from "moment";
 
 export const addPurchase = async (req, res) => {
-    const { product_id, price, quantity } = req.body;
+    const { product_id, price, quantity, total_amount } = req.body;
 
     // Basic validation
-    if (!product_id || !price || !quantity) {
+    if (!product_id || !price || !quantity || !total_amount) {
         return res.status(400).json({ message: "Missing required fields" });
     }
 
@@ -13,12 +13,12 @@ export const addPurchase = async (req, res) => {
         const date = moment().format("YYYY-MM-DD");
 
         const insertQuery = `
-            INSERT INTO purchases (product_id, price, quantity, date)
-            VALUES (:product_id, :price, :quantity, :date)
+            INSERT INTO purchases (product_id, quantity, price, total_amount, date)
+            VALUES (:product_id, :quantity, :price,:total_amount, :date)
         `;
 
         await sequelize.query(insertQuery, {
-            replacements: { product_id, price, quantity, date },
+            replacements: { product_id, quantity, price,total_amount, date },
         });
 
         return res.status(201).json({ message: "Purchase added successfully" });
@@ -31,7 +31,7 @@ export const addPurchase = async (req, res) => {
 export const getProduct = async (req, res) => {
   try {
     const [products] = await sequelize.query(`
-      SELECT products.name, products.price 
+      SELECT *
       FROM products 
     `);
 
