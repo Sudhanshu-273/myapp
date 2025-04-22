@@ -11,7 +11,7 @@ export const updateUser = async (req, res) => {
       });
     }
 
-    // Fetch current user data
+  
     const [user] = await sequelize.query(
       `SELECT * FROM users WHERE id = :id`,
       {
@@ -39,7 +39,10 @@ export const updateUser = async (req, res) => {
     if (phone !== user.phone) {
       updateFields.phone = phone;
     }
-    
+
+    if(name !== user.name){
+      updateFields.name = name;
+    }
 
  
     if (Object.keys(updateFields).length === 0) {
