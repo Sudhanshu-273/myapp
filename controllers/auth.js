@@ -13,7 +13,7 @@ export const user_data = async (req, res) => {
 export const login = async (req, res) => {
     const user = req.body;
     try {
-        console.log(user);
+        // console.log(user);
         if (!user) {
             return res.status(404).json({
                 success: false,
@@ -38,7 +38,7 @@ export const login = async (req, res) => {
             });
         }
 
-        console.log(data);
+        console.log("user data",data);
 
         const user_id = data.id;
 
@@ -60,9 +60,8 @@ export const login = async (req, res) => {
         );
 
         res.status(201).json({
+            data: data,
             success: true,
-            email: email,
-            user_id: user_id,
             token: token,
             message: "Login successful",
         });
