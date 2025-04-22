@@ -15,3 +15,8 @@ export const getAllEquipment = async (req, res) => {
     }
 
 }
+
+export const accountTypes = async (req, res) => {
+    const [data] = await sequelize.query("SELECT * FROM user_accounts order by id");
+    res.json({ "data": data });
+}

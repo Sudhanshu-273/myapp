@@ -38,7 +38,7 @@ export const login = async (req, res) => {
             });
         }
 
-        console.log("user data",data);
+        console.log("user data", data);
 
         const user_id = data.id;
 
@@ -77,15 +77,12 @@ export const login = async (req, res) => {
 
 export const register = async (req, res) => {
     try {
-        const { email, password, confirmPassword } = req.body;
+        const { email, password, confirmPassword, accountType } = req.body;
 
         if (!email || !password || !confirmPassword) {
-            return res
-                .status(400)
-                .json({
-                    message:
-                        "email, password, and confirmPassword are required",
-                });
+            return res.status(400).json({
+                message: "email, password, and confirmPassword are required",
+            });
         }
 
         if (password !== confirmPassword) {
@@ -109,9 +106,13 @@ export const register = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
         const result = await sequelize.query(
-            "INSERT INTO users (email, password) VALUES (:email, :hashedPassword)",
+            "INSERT INTO users (email, password, account_type) VALUES (:email, :password, :account_type)",
             {
-                replacements: { email, hashedPassword },
+                replacements: {
+                    email: email,
+                    password: hashedPassword,
+                    account_type: accountType,
+                },
             },
         );
 
@@ -208,6 +209,24 @@ export const verifyOtp = async (req, res) => {
             message: "Incorrect otp",
         });
     }
+
+    try {
+        const result = await sequelize.query(
+            "update users set verified = 1 where email = :email",
+            {
+                replacements: {
+                    email: email,
+                },
+            },
+        );
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "OTP Cannot be Verified. Try Again Later",
+        });
+    }
+
+    console.log("User verified successfully:", result);
 
     // verify user code
 
