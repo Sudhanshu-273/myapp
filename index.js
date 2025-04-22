@@ -6,6 +6,7 @@ import { middle } from "./middlewares/middle.js";
 import { sequelize } from "./db.config.js";
 import authRoutes from "./routes/auth.js";
 import { verifyToken } from "./middlewares/auth.js";
+import session from "express-session";
 
 import salesRoutes from './routes/sales.js'
 import purchasesRoutes from './routes/purchases.js'
@@ -37,6 +38,12 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
 app.use(express.json());
+app.use(session({
+  secret: 'secret',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { maxAge: 300000 } // Optional: session expires in 5 minutes
+}));
 
 // routes use kia hai yaha pe
 
