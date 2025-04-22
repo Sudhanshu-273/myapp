@@ -145,6 +145,17 @@ export const sendOtp = async (req, res) => {
 
     console.log(process.env.MAIL_USER);
 
+    const [[user]] = await sequelize.query(
+        "select * from users where id = :user_id",
+        {
+            replacements: {
+                user_id: user_id,
+            },
+        },
+    );
+
+    console.log(user);
+
     const otp = generateOtp();
 
     // window.localStorage.setItem("otp", otp);
@@ -155,7 +166,7 @@ export const sendOtp = async (req, res) => {
     <div style="border-bottom:1px solid #eee">
       <a href="" style="font-size:1.4em;color: #00466a;text-decoration:none;font-weight:600">My Gym App</a>
     </div>
-    <p style="font-size:1.1em">Hi,</p>
+    <p style="font-size:1.1em">Hi ${user.name},</p>
     <p>Thank you for registering on My Gym App. Use the following OTP to complete your Sign Up procedures. OTP is valid for 5 minutes</p>
     <h2 style="background: #00466a;margin: 0 auto;width: max-content;padding: 0 10px;color: #fff;border-radius: 4px;">${otp}</h2>
     <p style="font-size:0.9em;">Regards,<br />Sudhanshu Chaubey</p>
