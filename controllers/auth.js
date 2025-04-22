@@ -147,7 +147,8 @@ export const sendOtp = async (req, res) => {
 
     const otp = generateOtp();
 
-    localStorage.setItem("otp", otp);
+    // window.localStorage.setItem("otp", otp);
+    req.session.otp = otp;
 
     const html_text = `<div style="font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2">
   <div style="margin:50px auto;width:70%;padding:20px 0">
@@ -196,14 +197,15 @@ export const sendOtp = async (req, res) => {
 
 export const verifyOtp = async (req, res) => {
     const { user_id, email, otp } = req.body;
-    const storedOtp = localStorage.getItem("otp");
+    const storedOtp = req.session.otp;
+    console.log(storedOtp, otp);
     if (!storedOtp) {
         return res.status(401).json({
             success: false,
             message: "Otp not found",
         });
     }
-    if (storedOtp !== otp) {
+    if (storedOtp != otp) {
         return res.status(401).json({
             success: false,
             message: "Incorrect otp",
@@ -226,7 +228,7 @@ export const verifyOtp = async (req, res) => {
         });
     }
 
-    console.log("User verified successfully:", result);
+    console.log("User verified successfully:");
 
     // verify user code
 
