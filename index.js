@@ -19,8 +19,6 @@ import customerRoutes from './routes/customer.js'
 const app = express()
 
 
-// swagger setup
-
 // sequelize connect kia hai
 
 sequelize

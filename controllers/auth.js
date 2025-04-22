@@ -23,7 +23,7 @@ export const login = async (req, res) => {
         const { email, password } = user;
 
         const [[data], m1] = await sequelize.query(
-            "select * from users where email = :email",
+            "select *, title  from users join user_accounts on users.id = user_accounts.id where email = :email",
             {
                 replacements: {
                     email: email,
@@ -58,7 +58,7 @@ export const login = async (req, res) => {
                 expiresIn: "9999h",
             },
         );
-
+        console.log(data);
         res.status(201).json({
             data: data,
             success: true,
