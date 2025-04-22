@@ -2,17 +2,16 @@ import { sequelize } from "../db.config.js";
 
 export const updateUser = async (req, res) => {
   try {
-    const { id, name } = req.body;
+    const { id, name, email, phone } = req.body;
 
-    // Validate required fields
-    if (!id || !name) {
+    if (!id || !name || !email || !phone) {
       return res.status(400).json({
         success: false,
-        message: "User ID and name are required.",
+        message: "User ID, email, and phone are required.",
       });
     }
 
-    // Check if user exists
+  
     const [user] = await sequelize.query(
       `SELECT * FROM users WHERE id = :id`,
       {
@@ -28,18 +27,47 @@ export const updateUser = async (req, res) => {
       });
     }
 
-    // Update name only
+    const updateFields = {};
+
+    // Check for email change
+    if (email !== user.email) {
+      updateFields.email = email;
+      updateFields.verified = 0; 
+    }
+
+    // Check for phone change
+    if (phone !== user.phone) {
+      updateFields.phone = phone;
+    }
+
+    if(name !== user.name){
+      updateFields.name = name;
+    }
+
+ 
+    if (Object.keys(updateFields).length === 0) {
+      return res.status(200).json({
+        success: true,
+        message: "No changes needed. User is already up to date.",
+      });
+    }
+
+  
+    const setClause = Object.keys(updateFields)
+      .map((key) => `${key} = :${key}`)
+      .join(", ");
+
     await sequelize.query(
-      `UPDATE users SET name = :name WHERE id = :id`,
+      `UPDATE users SET ${setClause} WHERE id = :id`,
       {
-        replacements: { id, name },
+        replacements: { id, ...updateFields },
         type: sequelize.QueryTypes.UPDATE,
       }
     );
 
     return res.status(200).json({
       success: true,
-      message: "User name updated successfully.",
+      message: "User updated successfully.",
     });
 
   } catch (error) {
