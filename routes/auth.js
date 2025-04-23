@@ -2,6 +2,9 @@ import express from "express";
 import { login, register, sendOtp, verifyOtp } from "../controllers/auth.js";
 
 const router = express.Router();
+
+console.log("Testing");
+
 router.post("/login", login);
 
 router.post("/register", register);
