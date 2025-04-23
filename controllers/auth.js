@@ -12,24 +12,27 @@ export const user_data = async (req, res) => {
 
 export const login = async (req, res) => {
     const user = req.body;
+    console.log("Login Called -> ", user);
     try {
         // console.log(user);
         if (!user) {
             return res.status(404).json({
                 success: false,
-                message: "User not Found.",
+                message: "User not Found in req body.",
             });
         }
         const { email, password } = user;
 
         const [[data], m1] = await sequelize.query(
-            "select *, title  from users join user_accounts on users.id = user_accounts.id where email = :email",
+            "select users.id, users.name, users.email, users.phone,users.password,  users.account_status, users.verified, user_accounts.title from users inner join user_accounts on users.account_type = user_accounts.id where users.email = :email",
             {
                 replacements: {
                     email: email,
                 },
             },
         );
+
+        console.log(data);
 
         if (!data) {
             return res.status(404).json({
@@ -59,7 +62,7 @@ export const login = async (req, res) => {
             },
         );
         console.log(data);
-        res.status(201).json({
+        res.status(200).json({
             data: data,
             success: true,
             token: token,
@@ -70,7 +73,7 @@ export const login = async (req, res) => {
         return res.status(500).json({
             data: {},
             success: false,
-            message: "some error occured",
+            message: "some error occured : " + error,
         });
     }
 };
