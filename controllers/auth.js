@@ -144,15 +144,15 @@ export const generateOtp = () => {
 };
 
 export const sendOtp = async (req, res) => {
-    const { user_id, email } = req.body;
+    const { email } = req.body;
 
     console.log(process.env.MAIL_USER);
 
     const [[user]] = await sequelize.query(
-        "select * from users where id = :user_id",
+        "select * from users where email = :email",
         {
             replacements: {
-                user_id: user_id,
+                email: email,
             },
         },
     );
