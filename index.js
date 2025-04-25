@@ -8,17 +8,15 @@ import authRoutes from "./routes/auth.js";
 import { verifyToken } from "./middlewares/auth.js";
 import session from "express-session";
 
-import salesRoutes from './routes/sales.js'
-import purchasesRoutes from './routes/purchases.js'
-import productsRoutes from './routes/products.js'
-import userRoutes from    './routes/user.js'
-import customerRoutes from './routes/customer.js'
-
+import salesRoutes from "./routes/admin/sales.js";
+import purchasesRoutes from "./routes/admin/purchases.js";
+import productsRoutes from "./routes/admin/products.js";
+import userRoutes from "./routes/admin/user.js";
+import customerRoutes from "./routes/member/customer.js";
 
 // express app initialize hua hai
 
-const app = express()
-
+const app = express();
 
 // sequelize connect kia hai
 
@@ -38,23 +36,24 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
 app.use(express.json());
-app.use(session({
-  secret: 'secret',
-  resave: false,
-  saveUninitialized: true,
-  cookie: { maxAge: 300000 } // Optional: session expires in 5 minutes
-}));
+app.use(
+    session({
+        secret: "secret",
+        resave: false,
+        saveUninitialized: true,
+        cookie: { maxAge: 300000 }, // Optional: session expires in 5 minutes
+    }),
+);
 
 // routes use kia hai yaha pe
 
 app.use("/auth", authRoutes);
-app.use("/sale", salesRoutes);
-app.use("/purchases", purchasesRoutes);
-app.use("/products", productsRoutes);
+app.use("/admin/sale", salesRoutes);
+app.use("/admin/purchases", purchasesRoutes);
+app.use("/admin/products", productsRoutes);
+app.use("/admin/user", userRoutes);
 app.use("/", homeRoutes);
-app.use("/customer", customerRoutes); 
-app.use("/user", userRoutes);
-
+app.use("/member/customer", customerRoutes);
 
 // server idhar fire hua hai
 

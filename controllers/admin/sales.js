@@ -1,4 +1,4 @@
-import { sequelize } from "../db.config.js";
+import { sequelize } from "../../db.config.js";
 import moment from "moment";
 
 export const addSale = async (req, res) => {
@@ -8,7 +8,7 @@ export const addSale = async (req, res) => {
         return res.status(400).json({ message: "All fields are required" });
     }
 
-    const currentDate = moment().format("YYYY-MM-DD");
+    const currentDate = moment().utcOffset("+05:30").format("YYYY-MM-DD HH:mm:ss");
 
     const insertQuery = `
         INSERT INTO sales (customer_id, product_id, totalAmount, quantity, sale_date)

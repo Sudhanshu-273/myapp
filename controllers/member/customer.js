@@ -1,4 +1,4 @@
-import { sequelize } from "../db.config.js";
+import { sequelize } from "../../db.config.js";
 import moment from "moment";
 
 export const getCustomer = async (req, res) => {

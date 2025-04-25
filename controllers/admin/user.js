@@ -1,4 +1,4 @@
-import { sequelize } from "../db.config.js";
+import { sequelize } from "../../db.config.js";
 import bcrypt from "bcrypt"
 export const updateUser = async (req, res) => {
   try {
