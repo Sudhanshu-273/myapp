@@ -13,6 +13,7 @@ import purchasesRoutes from "./routes/admin/purchases.js";
 import productsRoutes from "./routes/admin/products.js";
 import userRoutes from "./routes/user.js";
 import customerRoutes from "./routes/member/customer.js";
+import plansRoutes from "./routes/admin/plans.js";
 
 // express app initialize hua hai
 
@@ -51,6 +52,7 @@ app.use("/auth", authRoutes);
 app.use("/member/sale", salesRoutes);
 app.use("/admin/purchases", purchasesRoutes);
 app.use("/admin/products", productsRoutes);
+app.use('/admin/plans', plansRoutes);
 app.use("/user", userRoutes);
 app.use("/", homeRoutes);
 app.use("/member/customer", customerRoutes);
