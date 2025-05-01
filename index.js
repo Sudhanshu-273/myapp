@@ -33,6 +33,8 @@ sequelize
 
 // middleware use kia hai basic wale saare
 
+
+
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
