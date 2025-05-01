@@ -71,25 +71,25 @@ export const add_subscription = async (req, res) => {
     let end_date = moment().utcOffset("+05:30").format("YYYY-MM-DD");
 
     switch (duration) {
-      case 1:
+      case "1":
         end_date = moment()
         .utcOffset("+05:30")
         .subtract(-1, "months")
         .format("YYYY-MM-DD");
         break;
-      case 3:
+      case "3":
         end_date = moment()
           .utcOffset("+05:30")
           .subtract(-3, "months")
           .format("YYYY-MM-DD");
         break;
-      case 6:
+      case "6":
         end_date = moment()
           .utcOffset("+05:30")
           .subtract(-6, "months")
           .format("YYYY-MM-DD");
         break;
-      case 12:
+      case "12":
         end_date = moment()
           .utcOffset("+05:30")
           .subtract(-12, "months")
