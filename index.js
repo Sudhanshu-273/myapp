@@ -50,12 +50,13 @@ app.use(
 
 app.use("/auth", authRoutes);
 app.use("/member/sale", salesRoutes);
+app.use("/member/customer", customerRoutes);
 app.use("/admin/purchases", purchasesRoutes);
 app.use("/admin/products", productsRoutes);
 app.use('/admin/plans', plansRoutes);
 app.use("/user", userRoutes);
 app.use("/", homeRoutes);
-app.use("/member/customer", customerRoutes);
+// app.use("/member/customer", customerRoutes);
 
 // server idhar fire hua hai
 

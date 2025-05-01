@@ -34,34 +34,60 @@ export const getPlans = async (req, res) => {
   res.json({ data: plans });
 };
 
-export const addSubscriber = async (req, res) => {
-  try {
-    const { customer_id, plan_id, price, duration } = req.body;
+export const getDurations = async (req, res) => {
+  const getDurationsSQL = 'select DISTINCT duration from plans;';
+  const [data] = await sequelize.query(getDurationsSQL);
+  const durations = data.map((item) => item.duration);
+  res.status(200).json({ data: durations });
+}
 
-    let start_date = moment().utcOffset("+05:30").format("DD-MM-YYYY");
+export const getPlanTypes = async (req, res) => {
+  const getPlanTypesSQL = 'select * from plan_types';
+  const [data] = await sequelize.query(getPlanTypesSQL);
+  res.status(200).json({ data: data });
+}
+
+export const add_subscription = async (req, res) => {
+
+  // isko update karna hai
+
+  try {
+    const { user_id, plan_id, price } = req.body;
+
+    const [[plan]] = await sequelize.query('select * from plans where id = :plan_id', {
+      replacements: {
+        plan_id: plan_id
+      }
+      }
+    );
+
+    console.log(plan.plan_type)
+    let duration = plan.plan_type;
+
+    let start_date = moment().utcOffset("+05:30").format("YYYY-MM-DD");
 
     let end_date = moment().utcOffset("+05:30").format("YYYY-MM-DD");
 
     switch (duration) {
-      case "1":
+      case 1:
         end_date = moment()
-          .utcOffset("+05:30")
-          .subtract(-1, "months")
-          .format("YYYY-MM-DD");
+        .utcOffset("+05:30")
+        .subtract(-1, "months")
+        .format("YYYY-MM-DD");
         break;
-      case "3":
+      case 3:
         end_date = moment()
           .utcOffset("+05:30")
           .subtract(-3, "months")
           .format("YYYY-MM-DD");
         break;
-      case "6":
+      case 6:
         end_date = moment()
           .utcOffset("+05:30")
           .subtract(-6, "months")
           .format("YYYY-MM-DD");
         break;
-      case "12":
+      case 12:
         end_date = moment()
           .utcOffset("+05:30")
           .subtract(-12, "months")
@@ -71,19 +97,21 @@ export const addSubscriber = async (req, res) => {
     }
 
     const [data] = await sequelize.query(
-      "INSERT INTO subscriptions (customer_id, plan_id, total_price, start_date, end_date) VALUES (:customer_id, :plan_id, :price, :start_date, :end_date)",
+      "insert into subscriptions (user_id, plan_type, amount, start_date, end_date) values (:user_id, :plan_id, :amount, :start_date, :end_date)",
       {
         replacements: {
-          customer_id: customer_id,
+          user_id: user_id,
           plan_id: plan_id,
-          price: price,
+          amount: price,
           start_date: start_date,
           end_date: end_date,
         },
       },
     );
 
-    return res.json({ message: "Subscriber added successfully" });
+    return res.json({ message: "Subscriber added successfully", data : {
+      subscription_id : data
+    } });
   } catch (err) {
     console.log(err);
     return res.json({ message: "Error adding subscriber", error: err });
