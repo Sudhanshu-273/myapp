@@ -58,10 +58,9 @@ app.use("/admin/products", productsRoutes);
 app.use('/admin/plans', plansRoutes);
 app.use("/user", userRoutes);
 app.use("/", homeRoutes);
-// app.use("/member/customer", customerRoutes);
 
 // server idhar fire hua hai
 
 app.listen(8080, (req, res) => {
-    console.log("Server up and running on " + process.env.DEV_PORT);
+    console.log("Server up and running on http://localhost:" + process.env.DEV_PORT);
 });

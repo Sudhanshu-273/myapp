@@ -3,9 +3,10 @@ import moment from "moment";
 
 export const addSale = async (req, res) => {
   try {
-    const { user_id, items, total_amount } = req.body;
-    if (!user_id || !items || !total_amount) {
-      return res.status(400).json({ message: "All fields are required" });
+    const { user_id, items, totalAmount } = req.body;
+    console.log(req.body);
+    if (!user_id || !totalAmount) {
+      return res.status(400).json({ message: "All fields are required urgent." });
     }
     items.map(async (item) => {
       const { product_id, quantity, price } = item;
@@ -24,7 +25,7 @@ export const addSale = async (req, res) => {
     const data = await sequelize.query(insertQuery, {
       replacements: {
         user_id: user_id,
-        amount: total_amount,
+        amount: totalAmount,
         receipt_date: currentDate,
       },
       type: sequelize.QueryTypes.INSERT,
