@@ -32,6 +32,11 @@ sequelize
     });
 
 // middleware use kia hai basic wale saare
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> bd4a1bd (added getplan)
 
 app.use(cors());
 app.use(bodyParser.json());
