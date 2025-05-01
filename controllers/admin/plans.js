@@ -21,7 +21,7 @@ export const addPlan = async (req, res) => {
   }
 
   try {
- 
+
     const [planType] = await sequelize.query(
       `SELECT * FROM plan_types WHERE id = :id`,
       {
@@ -65,7 +65,7 @@ export const updatePlan = async (req, res) => {
   }
 
   try {
-  
+
     const [plan] = await sequelize.query(
       `SELECT * FROM plans WHERE id = :id`,
       {
@@ -117,7 +117,7 @@ export const deletePlan = async (req, res) => {
   }
 
   try {
-   
+
     const [plan] = await sequelize.query(
       `SELECT * FROM plans WHERE id = :id`,
       {
@@ -130,7 +130,7 @@ export const deletePlan = async (req, res) => {
       return res.status(404).json({ message: "Plan not found." });
     }
 
-    
+
     await sequelize.query(
       `DELETE FROM plans WHERE id = :id`,
       {
@@ -183,7 +183,7 @@ export const addPlanType = async (req, res) => {
   }
 
   try {
-   
+
     const existingPlan = await sequelize.query(
       `SELECT * FROM plan_types WHERE name = :name`,
       {
@@ -196,7 +196,7 @@ export const addPlanType = async (req, res) => {
       return res.status(409).json({ message: "Plan type already exists." });
     }
 
-  
+
     await sequelize.query(
       `INSERT INTO plan_types (name, description) VALUES (:name, :description)`,
       {
@@ -222,7 +222,7 @@ export const updatePlanType = async (req, res) => {
   }
 
   try {
-    
+
     const [existingPlan] = await sequelize.query(
       `SELECT * FROM plan_types WHERE id = :id`,
       {
@@ -235,7 +235,7 @@ export const updatePlanType = async (req, res) => {
       return res.status(404).json({ message: "Plan type not found." });
     }
 
-  
+
     await sequelize.query(
       `UPDATE plan_types SET name = :name, description = :description WHERE id = :id`,
       {
@@ -258,7 +258,7 @@ export const deletePlanType = async (req, res) => {
   }
 
   try {
-  
+
     const [planType] = await sequelize.query(
       `SELECT * FROM plan_types WHERE id = :id`,
       {

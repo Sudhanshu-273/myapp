@@ -52,17 +52,19 @@ export const add_subscription = async (req, res) => {
   // isko update karna hai
 
   try {
-    const { user_id, plan_id, price } = req.body;
+    const { plan_type, duration, user_id, price } = req.body;
+    // plan_type duration user_id price
 
-    const [[plan]] = await sequelize.query('select * from plans where id = :plan_id', {
+    const [[plan]] = await sequelize.query('select * from plans where plan_type = :plan_type and duration = :duration', {
       replacements: {
-        plan_id: plan_id
+        plan_type: plan_type,
+        duration: duration
       }
       }
     );
 
-    console.log(plan.plan_type)
-    let duration = plan.plan_type;
+    // console.log(plan.plan_type)
+    // let duration = plan.plan_type;
 
     let start_date = moment().utcOffset("+05:30").format("YYYY-MM-DD");
 
@@ -97,11 +99,11 @@ export const add_subscription = async (req, res) => {
     }
 
     const [data] = await sequelize.query(
-      "insert into subscriptions (user_id, plan_type, amount, start_date, end_date) values (:user_id, :plan_id, :amount, :start_date, :end_date)",
+      "insert into subscriptions (user_id, plan_id, amount, start_date, end_date) values (:user_id, :plan_id, :amount, :start_date, :end_date)",
       {
         replacements: {
           user_id: user_id,
-          plan_id: plan_id,
+          plan_id: plan.id,
           amount: price,
           start_date: start_date,
           end_date: end_date,
