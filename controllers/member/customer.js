@@ -48,28 +48,35 @@ export const getPlanTypes = async (req, res) => {
 }
 
 export const add_subscription = async (req, res) => {
-
-  // isko update karna hai
-
   try {
     const { plan_type, duration, user_id, price } = req.body;
-    // plan_type duration user_id price
 
-    const [[plan]] = await sequelize.query('select * from plans where plan_type = :plan_type and duration = :duration', {
-      replacements: {
-        plan_type: plan_type,
-        duration: duration
-      }
+    // Validate required fields
+    if (!plan_type || !duration || !user_id || !price) {
+      return res.status(400).json({ message: "Missing required fields." });
+    }
+
+    // Fetch the plan matching the plan type name and duration
+    const [[plan]] = await sequelize.query(
+      `
+      SELECT p.* 
+      FROM plans p 
+      JOIN plan_types pt ON p.plan_type = pt.id 
+      WHERE pt.name = :plan_type AND p.duration = :duration
+      `,
+      {
+        replacements: { plan_type, duration },
       }
     );
 
-    // console.log(plan.plan_type)
-    // let duration = plan.plan_type;
+    if (!plan) {
+      return res.status(404).json({ message: "Plan not found for the given type and duration." });
+    }
 
-    let start_date = moment().utcOffset("+05:30").format("YYYY-MM-DD");
+    // Calculate start and end dates
+    const start_date = moment().utcOffset("+05:30").format("YYYY-MM-DD");
 
-    let end_date = moment().utcOffset("+05:30").format("YYYY-MM-DD");
-
+    let end_date;
     switch (duration) {
       case "1":
         end_date = moment()
@@ -98,24 +105,33 @@ export const add_subscription = async (req, res) => {
       default:
     }
 
-    const [data] = await sequelize.query(
-      "insert into subscriptions (user_id, plan_id, amount, start_date, end_date) values (:user_id, :plan_id, :amount, :start_date, :end_date)",
+    // Insert subscription
+    const [result] = await sequelize.query(
+      `
+      INSERT INTO subscriptions (user_id, plan_id, amount, start_date, end_date) 
+      VALUES (:user_id, :plan_id, :amount, :start_date, :end_date)
+      `,
       {
         replacements: {
-          user_id: user_id,
+          user_id,
           plan_id: plan.id,
           amount: price,
-          start_date: start_date,
-          end_date: end_date,
+          start_date,
+          end_date,
         },
-      },
+      }
     );
 
-    return res.json({ message: "Subscriber added successfully", data : {
-      subscription_id : data
-    } });
+    if (!result) {
+      return res.status(500).json({ message: "Failed to add subscription." });
+    }
+
+    return res.status(201).json({
+      message: "Subscriber added successfully.",
+      data: { subscription_id: result },
+    });
   } catch (err) {
-    console.log(err);
-    return res.json({ message: "Error adding subscriber", error: err });
+    console.error("Error in add_subscription:", err);
+    return res.status(500).json({ message: "Internal Server Error", error: err.message });
   }
-};
+}
