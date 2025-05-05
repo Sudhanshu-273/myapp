@@ -1,5 +1,34 @@
 import { sequelize } from "../db.config.js";
 import bcrypt from "bcrypt";
+
+export const listUser = async (req, res) => {
+  try {
+    const [users] = await sequelize.query("SELECT * FROM users");
+
+    if (!users || users.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No users found.",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: users,
+      message: "Users fetched successfully.",
+    });
+  } catch (error) {
+    console.error("Error fetching users:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "An error occurred while fetching users.",
+      error: error.message,
+    });
+  }
+};
+
+
 export const updateUser = async (req, res) => {
   try {
     const { id, name, email, phone } = req.body;
@@ -130,3 +159,5 @@ export const forgotPassword = async (req, res) => {
     });
   }
 };
+
+
