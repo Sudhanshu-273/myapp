@@ -14,6 +14,7 @@ import productsRoutes from "./routes/admin/products.js";
 import userRoutes from "./routes/user.js";
 import customerRoutes from "./routes/member/customer.js";
 import plansRoutes from "./routes/admin/plans.js";
+import dashboardRoutes from "./routes/admin/dashboard.js";
 
 // express app initialize hua hai
 
@@ -56,6 +57,7 @@ app.use("/member/customer", customerRoutes);
 app.use("/admin/purchases", purchasesRoutes);
 app.use("/admin/products", productsRoutes);
 app.use('/admin/plans', plansRoutes);
+app.use('/admin/dashboard', dashboardRoutes)
 app.use("/user", userRoutes);
 app.use("/", homeRoutes);
 

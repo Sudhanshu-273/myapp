@@ -3,6 +3,7 @@ import { sequelize } from "../db.config.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import nodemailer from "nodemailer";
+import moment from "moment";
 
 export const user_data = async (req, res) => {
     const [data] = await sequelize.query("SELECT * FROM users");
@@ -108,13 +109,16 @@ export const register = async (req, res) => {
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
+        const registered_date = moment().utcOffset("+05:30").format("YYYY-MM-DD HH:mm:ss");
+
         const result = await sequelize.query(
-            "INSERT INTO users (email, password, account_type) VALUES (:email, :password, :account_type)",
+            "INSERT INTO users (email, password, account_type, registered_date) VALUES (:email, :password, :account_type, :registered_date)",
             {
                 replacements: {
                     email: email,
                     password: hashedPassword,
                     account_type: accountType,
+                    registered_date: registered_date,
                 },
             },
         );
