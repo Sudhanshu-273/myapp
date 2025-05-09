@@ -10,5 +10,5 @@ router.get('/get_percent', getSales);
 
 router.get('/weekly_user', getWeeklyUser);
 router.get('/monthly_user', getMonthlyUser);
-router.get('/get_percent', getUser)
+router.get('/get_percent_user', getUser)
 export default router;
