@@ -2,6 +2,8 @@ import { sequelize } from "../db.config.js";
 
 export const home = async (req, res) => {
 
+    console.log(req.user.id);
+
     res.json({ "message": "Welcome to the home page" });
 }
 
