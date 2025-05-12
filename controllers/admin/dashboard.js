@@ -1,14 +1,17 @@
 import { sequelize } from "../../db.config.js";
 export const getWeeklySales = async (req, res) => {
     try {
-    const [result] = await sequelize.query(
-      `
-       SELECT 
-        SUM(amount) AS total_sales, 
-        SUM(CASE WHEN YEARWEEK(receipt_date, 1) = YEARWEEK(CURDATE(), 1) THEN amount ELSE 0 END) AS weekly_sales
-      FROM receipts
-      ` 
-    );
+      const [result] = await sequelize.query(
+        `
+        SELECT 
+          SUM(amount) AS total_sales, 
+          SUM(CASE 
+            WHEN receipt_date BETWEEN DATE_SUB(CURDATE(), INTERVAL 7 DAY) AND CURDATE()
+            THEN amount ELSE 0 END
+          ) AS weekly_sales
+        FROM receipts
+        `
+      );      
     let amount = result[0].weekly_sales || 0;
     let formattedTotal = 0;
 
@@ -116,7 +119,9 @@ export const getWeeklyUser = async (req, res) => {
     const [result] = await sequelize.query(`
       SELECT 
         COUNT(*) AS total_users,
-        COUNT(CASE WHEN YEARWEEK(registered_date, 1) = YEARWEEK(CURDATE(), 1) THEN 1 END) AS weekly_users
+        COUNT(CASE 
+          WHEN registered_date BETWEEN DATE_SUB(CURDATE(), INTERVAL 7 DAY) AND CURDATE()
+        THEN 1 END) AS weekly_users
       FROM users
     `);
 
