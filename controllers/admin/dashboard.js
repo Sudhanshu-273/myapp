@@ -1,118 +1,81 @@
 import { sequelize } from "../../db.config.js";
+import { formatNumber, calculatePercentageChange } from "../../utils/format.js";
+
+const sendSuccessResponse = (res, data, message = "Success") => {
+  return res.status(200).json({ message, ...data });
+};
+
 export const getWeeklySales = async (req, res) => {
-    try {
-      const [result] = await sequelize.query(
-        `
-        SELECT 
-          SUM(amount) AS total_sales, 
-          SUM(CASE 
-            WHEN receipt_date BETWEEN DATE_SUB(CURDATE(), INTERVAL 7 DAY) AND CURDATE()
-            THEN amount ELSE 0 END
-          ) AS weekly_sales
-        FROM receipts
-        `
-      );      
-    let amount = result[0].weekly_sales || 0;
-    let formattedTotal = 0;
+  try {
+    const [result] = await sequelize.query(`
+      SELECT 
+        SUM(amount) AS total_sales, 
+        SUM(CASE 
+          WHEN receipt_date BETWEEN DATE_SUB(CURDATE(), INTERVAL 7 DAY) AND CURDATE()
+          THEN amount ELSE 0 END
+        ) AS weekly_sales
+      FROM receipts
+    `);
 
-    if (amount >= 1000000) {
-      formattedTotal = (amount / 1000000).toFixed(1) + 'M';
-    } else if (amount >= 1000) {
-      formattedTotal = (amount / 1000).toFixed(1) + 'K';
-    } else {
-      formattedTotal = amount;
-    }
-    return res.status(200).json({
-      message: "Weekly sales fetched successfully",
-      total_aomunt: formattedTotal,
-      weekly_sales: result[0].weekly_sales,
-      total_sales:result[0].total_sales,
+    const total_sales = (result[0].total_sales || 0);
+    const weekly_sales = formatNumber(result[0].weekly_sales || 0);
 
-    });
+    return sendSuccessResponse(res, { total_sales, weekly_sales }, "Weekly sales fetched successfully");
   } catch (error) {
-    console.error("Error fetching monthly sales:", error);
-    return res.status(500).json({
-      message: "Failed to fetch monthly sales",
-      error: error.message,
-    });
+    console.error("Error fetching weekly sales:", error);
+    return res.status(500).json({ message: "Failed to fetch weekly sales", error: error.message });
   }
-}
+};
 
 export const getMonthlySales = async (req, res) => {
   try {
-    const [result] = await sequelize.query(
-      `
-     SELECT 
+    const [result] = await sequelize.query(`
+      SELECT 
+        DATE_FORMAT(receipt_date, '%Y-%m') AS month,
         SUM(amount) AS total_sales
       FROM receipts
-      GROUP BY DATE_FORMAT(receipt_date, '%Y-%m')
-      ORDER BY DATE_FORMAT(receipt_date, '%Y-%m') DESC
-      `
-    );
+      GROUP BY month
+      ORDER BY month ASC
+    `);
 
-    const monthlySales = result.map(row => row.total_sales);
-
-    res.status(200).json({
-      message: "Monthly sales fetched successfully",
-      monthly_sales: monthlySales,
-    });
+    const monthly_sales = result.map(row => formatNumber(row.total_sales || 0));
+    return sendSuccessResponse(res, { monthly_sales }, "Monthly sales fetched successfully");
   } catch (error) {
     console.error("Error fetching monthly sales:", error);
-    return res.status(500).json({
-      message: "Failed to fetch monthly sales",
-      error: error.message,
-    });
+    return res.status(500).json({ message: "Failed to fetch monthly sales", error: error.message });
   }
 };
 
 export const getSales = async (req, res) => {
-    try {
-      const [result] = await sequelize.query(
-        `
-        SELECT 
-          SUM(amount) AS total_sales
-        FROM receipts
-        GROUP BY DATE_FORMAT(receipt_date, '%Y-%m')
-        ORDER BY receipt_date DESC
-        `
-      );
-  
-      if (result.length < 2) {
-        return res.status(200).json({
-          message: "Not enough data to calculate percentage change.",
-          percentage_change: null,
-        });
-      }
+  try {
+    const [result] = await sequelize.query(`
+      SELECT 
+        DATE_FORMAT(receipt_date, '%Y-%m') AS month,
+        SUM(amount) AS total_sales
+      FROM receipts
+      GROUP BY month
+      ORDER BY month DESC
+      LIMIT 2
+    `);
 
-      const currentMonthSales = result[0].total_sales;
-      const previousMonthSales = result[1].total_sales;  
-      const percentageChange =
-        ((currentMonthSales - previousMonthSales) / previousMonthSales) * 100;
-
-      const formatSales = (value) => {
-        if (value >= 1_000_000) {
-          return (value / 1_000_000).toFixed(1) + 'M';
-        } else if (value >= 1_000) {
-          return (value / 1_000).toFixed(1) + 'K';
-        } else {
-          return value.toString();
-        }
-      };
-  
-      res.status(200).json({
-        message: "Percentage change fetched successfully",
-        percentage_change: `${percentageChange.toFixed(2)}%`,
-        current_month_sales: formatSales(currentMonthSales),
-        previous_month_sales: formatSales(previousMonthSales),
-      });
-    } catch (error) {
-      console.error("Error fetching sales data:", error);
-      return res.status(500).json({
-        message: "Failed to fetch sales data",
-        error: error.message,
-      });
+    if (result.length < 2) {
+      return sendSuccessResponse(res, { percentage_change: null }, "Not enough data to calculate percentage change.");
     }
-  };
+
+    const current = result[0].total_sales;
+    const previous = result[1].total_sales;
+    const percentage_change = calculatePercentageChange(current, previous);
+
+    return sendSuccessResponse(res, {
+      percentage_change: `${percentage_change.toFixed(2)}%`,
+      current_month_sales: formatNumber(current),
+      previous_month_sales: formatNumber(previous)
+    }, "Percentage change fetched successfully");
+  } catch (error) {
+    console.error("Error fetching sales data:", error);
+    return res.status(500).json({ message: "Failed to fetch sales data", error: error.message });
+  }
+};
 
 export const getWeeklyUser = async (req, res) => {
   try {
@@ -125,26 +88,13 @@ export const getWeeklyUser = async (req, res) => {
       FROM users
     `);
 
-    const totalUsers = result[0].total_users;
-    const weeklyUsers = result[0].weekly_users;
-
-    const formatNumber = (num) => {
-      if (num >= 1_000_000) return (num / 1_000_000).toFixed(1) + "M";
-      if (num >= 1_000) return (num / 1_000).toFixed(1) + "K";
-      return num;
-    };
-
-    res.status(200).json({
-      message: "User statistics fetched successfully",
-      total_users: formatNumber(totalUsers),
-      weekly_users: formatNumber(weeklyUsers),
-    });
+    return sendSuccessResponse(res, {
+      total_users: (result[0].total_users),
+      weekly_users: formatNumber(result[0].weekly_users)
+    }, "User statistics fetched successfully");
   } catch (error) {
     console.error("Error fetching user stats:", error);
-    res.status(500).json({
-      message: "Failed to fetch user stats",
-      error: error.message,
-    });
+    return res.status(500).json({ message: "Failed to fetch user stats", error: error.message });
   }
 };
 
@@ -159,18 +109,11 @@ export const getMonthlyUser = async (req, res) => {
       ORDER BY month ASC
     `);
 
-    const monthlyUsers = result.map(row => row.user_count);
-
-    res.status(200).json({
-      message: "Monthly user count fetched successfully",
-      monthly_users: monthlyUsers
-    });
+    const monthly_users = result.map(row => row.user_count);
+    return sendSuccessResponse(res, { monthly_users }, "Monthly user count fetched successfully");
   } catch (error) {
     console.error("Error fetching monthly users:", error);
-    res.status(500).json({
-      message: "Failed to fetch monthly users",
-      error: error.message
-    });
+    return res.status(500).json({ message: "Failed to fetch monthly users", error: error.message });
   }
 };
 
@@ -187,30 +130,18 @@ export const getUser = async (req, res) => {
     `);
 
     if (result.length < 2) {
-      return res.status(200).json({
-        message: "Not enough data to calculate percentage change.",
-        percentage_change: null,
-      });
+      return sendSuccessResponse(res, { percentage_change: null }, "Not enough data to calculate percentage change.");
     }
 
-    const currentMonthUsers = result[0].user_count;
-    const previousMonthUsers = result[1].user_count;
+    const current = result[0].user_count;
+    const previous = result[1].user_count;
+    const percentage_change = calculatePercentageChange(current, previous);
 
-    let percentageChange = 0;
-
-    if (previousMonthUsers !== 0) {
-      percentageChange = ((currentMonthUsers - previousMonthUsers) / previousMonthUsers) * 100;
-    }
-
-    res.status(200).json({
-      message: "Percentage change in user registration fetched successfully",
-      percentage_change: `${percentageChange.toFixed(2)}%`
-    });
+    return sendSuccessResponse(res, {
+      percentage_change: `${percentage_change.toFixed(2)}%`
+    }, "Percentage change in user registration fetched successfully");
   } catch (error) {
     console.error("Error fetching user stats:", error);
-    res.status(500).json({
-      message: "Failed to fetch user statistics",
-      error: error.message,
-    });
+    return res.status(500).json({ message: "Failed to fetch user statistics", error: error.message });
   }
 };
