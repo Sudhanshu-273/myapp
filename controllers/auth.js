@@ -13,7 +13,7 @@ export const user_data = async (req, res) => {
 
 export const login = async (req, res) => {
     const user = req.body;
-    console.log("Login Called -> ", user);
+   
     try {
         // console.log(user);
         if (!user) {
@@ -42,8 +42,6 @@ export const login = async (req, res) => {
             });
         }
 
-        console.log("user data", data);
-
         const user_id = data.id;
 
         if (!(await bcrypt.compare(password, data.password))) {
@@ -53,6 +51,8 @@ export const login = async (req, res) => {
             });
         }
 
+        // for update time
+        await sequelize.query( `Update users set last_login_time = NOW() where id = ${user_id}`);
         const token = jwt.sign(
             {
                 id: user_id,
