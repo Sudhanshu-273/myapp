@@ -1,14 +1,10 @@
 import express from "express";
-import { getWeeklySales, getMonthlySales, getSales, getMonthlyUser, getWeeklyUser, getUser } from "../../controllers/admin/dashboard.js";
+import { getSalesDetails, getUserDetails } from "../../controllers/admin/dashboard.js";
+
 const router = express.Router();
-// for sales
-router.get('/weekly_sales', getWeeklySales);
-router.get('/monthly_sales', getMonthlySales);
-router.get('/get_percent', getSales);
 
-// for user
+// Combined endpoints
+router.get('/getSalesDetail', getSalesDetails);
+router.get('/getUsersDetail', getUserDetails);
 
-router.get('/weekly_user', getWeeklyUser);
-router.get('/monthly_user', getMonthlyUser);
-router.get('/get_percent_user', getUser)
 export default router;
