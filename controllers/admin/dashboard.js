@@ -1,5 +1,6 @@
 import { sequelize } from "../../db.config.js";
 import { formatNumber, calculatePercentageChange } from "../../utils/format.js";
+import moment from "moment";
 
 const sendSuccessResponse = (res, data, message = "Success") => {
   return res.status(200).json({ message, ...data });
@@ -32,7 +33,16 @@ export const getSalesDetails = async (req, res) => {
       ORDER BY month ASC
     `);
 
-    const monthly_sales = monthlySalesResult.map(row => formatNumber(row.total_sales || 0));
+    const salesMap = {};
+   monthlySalesResult.forEach(row => {
+   salesMap[row.month] = formatNumber(row.total_sales || 0);
+});
+
+  const currentYear = moment().year();
+  const monthsWithData = Array.from({ length: 12 }, (_, index) => {
+  const monthKey = `${currentYear}-${(index + 1).toString().padStart(2, '0')}`;
+  return salesMap[monthKey] || 0;
+});
 
     // Percent Change
     const [salesPercentResult] = await sequelize.query(`
@@ -52,7 +62,7 @@ export const getSalesDetails = async (req, res) => {
     if (salesPercentResult.length >= 2) {
       const current = salesPercentResult[0].total_sales;
       const previous = salesPercentResult[1].total_sales;
-      percentage_change = `${calculatePercentageChange(current, previous).toFixed(2)}%`;
+      percentage_change = `${calculatePercentageChange(current, previous).toFixed(2)}`;
       current_month_sales = formatNumber(current);
       previous_month_sales = formatNumber(previous);
     }
@@ -60,7 +70,7 @@ export const getSalesDetails = async (req, res) => {
     return sendSuccessResponse(res, {
       total_sales,
       weekly_sales,
-      monthly_sales,
+      monthsWithData,
       percentage_change,
       current_month_sales,
       previous_month_sales
@@ -96,7 +106,20 @@ export const getUserDetails = async (req, res) => {
       ORDER BY month ASC
     `);
 
-    const monthly_users = monthlyUserResult.map(row => row.user_count);
+    const userMap = {};
+  monthlyUserResult.forEach(row => {
+    userMap[row.month] = Number(row.user_count);
+  });
+
+// Set your desired year
+  const currentYear = moment().year(); // Or any year like 2025
+
+// Generate array for Jan–Dec of that year
+  const monthly_users = Array.from({ length: 12 }, (_, index) => {
+  const monthKey = `${currentYear}-${(index + 1).toString().padStart(2, '0')}`;
+  return userMap[monthKey] || 0;
+});
+
 
     // User Percent Change
     const [userPercentResult] = await sequelize.query(`
@@ -114,7 +137,7 @@ export const getUserDetails = async (req, res) => {
     if (userPercentResult.length >= 2) {
       const current = userPercentResult[0].user_count;
       const previous = userPercentResult[1].user_count;
-      user_percentage_change = `${calculatePercentageChange(current, previous).toFixed(2)}%`;
+      user_percentage_change = `${calculatePercentageChange(current, previous).toFixed(2)}`;
     }
 
     return sendSuccessResponse(res, {

@@ -52,7 +52,8 @@ export const login = async (req, res) => {
         }
 
         // for update time
-        await sequelize.query( `Update users set last_login_time = NOW() where id = ${user_id}`);
+        const last_login_time = moment().utcOffset("+05:30").format("YYYY-MM-DD HH:mm:ss");
+        await sequelize.query( ` UPDATE users SET last_login_time = '${last_login_time}' WHERE id = ${user_id}`);
         const token = jwt.sign(
             {
                 id: user_id,
