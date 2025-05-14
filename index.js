@@ -7,6 +7,7 @@ import { sequelize } from "./db.config.js";
 import authRoutes from "./routes/auth.js";
 import { verifyToken } from "./middlewares/auth.js";
 import session from "express-session";
+import './cron.js'
 
 import salesRoutes from "./routes/admin/sales.js";
 import purchasesRoutes from "./routes/admin/purchases.js";
