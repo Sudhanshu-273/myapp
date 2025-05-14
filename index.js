@@ -36,7 +36,12 @@ sequelize
 
 
 
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:3002',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    // credentials: true
+}));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
 app.use(express.json());
@@ -49,16 +54,22 @@ app.use(
     }),
 );
 
+app.use((req, res, next) => {
+    console.log("middle called")
+    console.log(`[${req.method}] ${req.originalUrl}`);
+    next();
+});
+
 // routes use kia hai yaha pe
 
 app.use("/auth", authRoutes);
-app.use("/member/sale", verifyToken, salesRoutes);
-app.use("/member/customer", verifyToken, customerRoutes);
-app.use("/admin/purchases", verifyToken, purchasesRoutes);
-app.use("/admin/products", verifyToken, productsRoutes);
-app.use('/admin/plans', verifyToken, plansRoutes);
-app.use('/admin/dashboard', verifyToken, dashboardRoutes)
-app.use("/user",verifyToken, userRoutes);
+app.use("/member/sale", salesRoutes);
+app.use("/member/customer", customerRoutes);
+app.use("/admin/purchases", purchasesRoutes);
+app.use("/admin/products", productsRoutes);
+app.use('/admin/plans', plansRoutes);
+app.use('/admin/dashboard', dashboardRoutes)
+app.use("/user", userRoutes);
 app.use("/", homeRoutes);
 
 // server idhar fire hua hai

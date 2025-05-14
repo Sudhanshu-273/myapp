@@ -151,3 +151,23 @@ export const getUserDetails = async (req, res) => {
     return res.status(500).json({ message: "Failed to fetch user details", error: error.message });
   }
 };
+
+export const topProducts = async (req, res) => {
+  try {
+    const topProductsSQL = "select s.product_id, p.name, SUM(s.price) as amount from sales s inner join products p on s.product_id=p.id group by s.product_id order by amount desc;";
+    const [data] = await sequelize.query(topProductsSQL);
+    console.log(data);
+    res.status(200).json({
+      status: true,
+      message: "Top products fetched",
+      data: data
+    });
+  } catch (error) {
+    console.log(error);
+    res.satus(500).json({
+      status: false,
+      message: error,
+    })
+  }
+
+}
